@@ -1,20 +1,28 @@
 import React from 'react'
 import { load } from '../utils/storage'
-import { saveAs } from 'file-saver'
-
-function toCSV(rows){
-  const keys = Object.keys(rows[0]||{})
-  const lines = [keys.join(','), ...rows.map(r=>keys.map(k=>('"'+String(r[k]||'')+'"').replace(/\n/g,' ')).join(','))]
-  return lines.join('\n')
-}
+import { downloadCSV } from '../utils/csv'
 
 export default function Reports(){
   const data = load()
 
-  function exportCSV(name, rows){
-    const blob = new Blob([toCSV(rows)], {type:'text/csv;charset=utf-8'})
-    saveAs(blob, name + '.csv')
+  function exportCSV(name, rows, columns){
+    downloadCSV(name, rows, columns)
   }
+
+  const farmersExportRows = data.farmers.map((farmer) => {
+    const deliveries = farmer.deliveries || []
+    const totalLiters = deliveries.reduce((sum, delivery) => sum + (Number(delivery.liters) || 0), 0)
+    return {
+      id: farmer.id,
+      name: farmer.name,
+      phone: farmer.phone || farmer.contact || '',
+      location: farmer.location,
+      price: farmer.price,
+      balance: farmer.balance,
+      deliveriesCount: deliveries.length,
+      totalLiters
+    }
+  })
 
   return (
     <div>
@@ -24,17 +32,17 @@ export default function Reports(){
         <div className="card">
           <h4>Expenses</h4>
           <div className="muted">{data.expenses.length} records</div>
-          <button className="btn" onClick={()=>exportCSV('expenses', data.expenses)}>Export CSV</button>
+          <button className="btn" onClick={()=>exportCSV('expenses', data.expenses, ['id', 'date', 'category', 'description', 'amount'])}>Export CSV</button>
         </div>
         <div className="card">
           <h4>Revenue</h4>
           <div className="muted">{data.revenue.length} records</div>
-          <button className="btn" onClick={()=>exportCSV('revenue', data.revenue)}>Export CSV</button>
+          <button className="btn" onClick={()=>exportCSV('revenue', data.revenue, ['id', 'date', 'product', 'quantity', 'unitPrice', 'total'])}>Export CSV</button>
         </div>
         <div className="card">
           <h4>Farmers</h4>
           <div className="muted">{data.farmers.length} records</div>
-          <button className="btn" onClick={()=>exportCSV('farmers', data.farmers)}>Export CSV</button>
+          <button className="btn" onClick={()=>exportCSV('farmers', farmersExportRows, ['id', 'name', 'phone', 'location', 'price', 'balance', 'deliveriesCount', 'totalLiters'])}>Export CSV</button>
         </div>
       </div>
     </div>

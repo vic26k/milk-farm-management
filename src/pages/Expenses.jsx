@@ -2,27 +2,28 @@ import React, { useEffect, useState } from 'react'
 import { load, save } from '../utils/storage'
 
 const categories = ['Farmer Payments','Milk Processing','Equipment Maintenance','Transportation','Workers Wages','Other']
+const getToday = () => new Date().toISOString().slice(0, 10)
 
 export default function Expenses(){
   const [data,setData] = useState(load())
-  const [form,setForm] = useState({date:'',category:categories[0],description:'',amount:0})
+  const [form,setForm] = useState({date:getToday(),category:categories[0],description:'',amount:0})
 
   useEffect(()=>{ const onStorage = ()=> setData(load()); window.addEventListener('storage', onStorage); return ()=>window.removeEventListener('storage', onStorage)},[])
 
   function add(){
     const exp = {...form, id:Date.now(), amount: parseFloat(form.amount)}
     const next = {...data, expenses:[...data.expenses, exp]}
-    save(next); setData(next); setForm({date:'',category:categories[0],description:'',amount:0})
+    save(next); setData(next); setForm({date:getToday(),category:categories[0],description:'',amount:0})
   }
 
   return (
     <div>
       <div className="page-header"><h2>Expenses</h2><div className="muted">Track outgoing costs</div></div>
 
-      <div className="card" style={{marginBottom:12}}>
+      <div className="card section-spacer">
         <h4>Add Expense</h4>
         <div className="form-row">
-          <input className="input" placeholder="Date (YYYY-MM-DD)" value={form.date} onChange={e=>setForm({...form,date:e.target.value})} />
+          <input className="input" type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})} />
           <select className="select" value={form.category} onChange={e=>setForm({...form,category:e.target.value})}>
             {categories.map(c=> <option key={c} value={c}>{c}</option>)}
           </select>

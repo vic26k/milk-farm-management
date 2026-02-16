@@ -47,10 +47,10 @@ export default function Dashboard(){
         <div className="card"> <div className="muted">Total Milk Collected</div> <h3>{totalMilk} L</h3></div>
         <div className="card"> <div className="muted">Total Expenses</div> <h3>${totalExpenses.toFixed(2)}</h3></div>
         <div className="card"> <div className="muted">Total Revenue</div> <h3>${totalRevenue.toFixed(2)}</h3></div>
-        <div className="card"> <div className="muted">Net Profit / Loss</div> <h3 style={{color: net>=0? 'green':'#ef4444'}}>${net.toFixed(2)}</h3></div>
+        <div className="card"> <div className="muted">Net Profit / Loss</div> <h3 className={net >= 0 ? 'profit-positive' : 'profit-negative'}>${net.toFixed(2)}</h3></div>
       </div>
 
-      <div style={{marginTop:20,display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
+      <div className="charts-grid">
         <div className="card">
           <h4>Revenue vs Expenses</h4>
           <Bar data={revenueVsExpense} />

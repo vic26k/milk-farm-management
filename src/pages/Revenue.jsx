@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { load, save } from '../utils/storage'
 
+const getToday = () => new Date().toISOString().slice(0, 10)
+
 export default function Revenue(){
   const [data,setData] = useState(load())
-  const [form,setForm] = useState({date:'',product:'Milk',quantity:0,unitPrice:0})
+  const [form,setForm] = useState({date:getToday(),product:'Milk',quantity:0,unitPrice:0})
 
   useEffect(()=>{ const onStorage = ()=> setData(load()); window.addEventListener('storage', onStorage); return ()=>window.removeEventListener('storage', onStorage)},[])
 
@@ -11,17 +13,17 @@ export default function Revenue(){
     const total = parseFloat(form.quantity || 0) * parseFloat(form.unitPrice || 0)
     const rev = {...form, id:Date.now(), total}
     const next = {...data, revenue:[...data.revenue, rev]}
-    save(next); setData(next); setForm({date:'',product:'Milk',quantity:0,unitPrice:0})
+    save(next); setData(next); setForm({date:getToday(),product:'Milk',quantity:0,unitPrice:0})
   }
 
   return (
     <div>
       <div className="page-header"><h2>Revenue</h2><div className="muted">Record income from sales</div></div>
 
-      <div className="card" style={{marginBottom:12}}>
+      <div className="card section-spacer">
         <h4>Add Revenue</h4>
         <div className="form-row">
-          <input className="input" placeholder="Date (YYYY-MM-DD)" value={form.date} onChange={e=>setForm({...form,date:e.target.value})} />
+          <input className="input" type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})} />
           <input className="input" placeholder="Product" value={form.product} onChange={e=>setForm({...form,product:e.target.value})} />
         </div>
         <div className="form-row">
