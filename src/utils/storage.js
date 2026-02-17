@@ -10,5 +10,19 @@ export function load(){
 }
 
 export function save(data){
-  localStorage.setItem(KEY, JSON.stringify(data))
+  try{
+    localStorage.setItem(KEY, JSON.stringify(data))
+  }catch(e){
+    // ignore localStorage errors
+  }
+
+  // fire-and-forget: attempt to save remotely if firebase is configured
+  try{
+    // dynamic import so the app still works if Firebase isn't configured / installed
+    import('../firebase').then(mod => {
+      if (mod && typeof mod.saveRemote === 'function') mod.saveRemote(data).catch(()=>{})
+    }).catch(()=>{})
+  }catch(e){/* ignore */}
 }
+
+export { KEY }
